@@ -14,4 +14,30 @@ export class ProductController {
     async create (@Body() productDto: CreateProductDto): Promise<DocumentType<ProductModel>> {
         return await this.productService.create(productDto);
     }
+
+    @Get()
+    async getAll (): Promise<DocumentType<ProductModel>[]> {
+        return await this.productService.getAll();
+    }
+
+    @Get(':id')
+    async get (@Param('id') id: string): Promise<DocumentType<ProductModel>> | null {
+        const product = await this.productService.get(id);
+
+        if (!product) {
+            throw new HttpException('Товар не найден', HttpStatus.NOT_FOUND);
+        }
+
+        return product;
+    }
+
+    @Delete(':id')
+    async delete (@Param('id') id: string): Promise<DocumentType<ProductModel>> | null {
+        return await this.productService.delete(id);
+    }
+
+    @Put(':id')
+    async update (@Param('id') id: string, @Body() updateProductDto: UpdateProductDto): Promise<DocumentType<ProductModel>> {
+        return await this.productService.update(id,updateProductDto);
+    }
 }
