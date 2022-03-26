@@ -45,7 +45,7 @@ export class StockService {
   async sell({ product_id, quantity }: SaleStockDto): Promise<ISellResponse> {
     const warehouse = await this.warehouseModel
       .findOne({ product_id })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: 1 });
     if (!warehouse) {
       throw new HttpException('Товара нету в складе', HttpStatus.NOT_FOUND);
     }
@@ -58,7 +58,12 @@ export class StockService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    await warehouse.updateOne({ quantity: count });
+
+    if (count == 0) {
+        await this.warehouseModel.findByIdAndDelete(warehouse._id);
+    } else {
+        await warehouse.updateOne({ quantity: count });
+    }
 
     const sale = await this.saleModel.create({ product_id, quantity });
 
